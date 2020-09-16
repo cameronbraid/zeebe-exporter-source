@@ -43,7 +43,7 @@ public class ConnectConnectors {
     if (protobufSourceConnectors != null && protobufSourceConnectors.size() > 0) {
       if (protobufSource == null) {
         throw new RuntimeException(
-            "There are Consumer<ProtobufSource> beans defined but protobuf support isn't turned on.  See zeebe.importer.kafk.enabled and zeebe.exporter.source.kafka.format:proto");
+            "There are ProtobufSourceConnector beans defined but no protocol buffer source is defined");
       }
       protobufSourceConnectors.forEach(connector -> connector.connectTo(protobufSource));
     }
@@ -51,7 +51,7 @@ public class ConnectConnectors {
     if (recordSourceConnectors != null && recordSourceConnectors.size() > 0) {
       if (recordSource == null && protobufSource == null) {
         throw new RuntimeException(
-            "There are Consumer<RecordSource> beans defined but protobuf or json support isn't turned on.  See zeebe.importer.kafk.enabled and zeebe.exporter.source.kafka.format:json|protobuf");
+            "There are RecordSourceConnector beans defined but no protobuf or json source is defined");
       }
 
       if (recordSource != null) {

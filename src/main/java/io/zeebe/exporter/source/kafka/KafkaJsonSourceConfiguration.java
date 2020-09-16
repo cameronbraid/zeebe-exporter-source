@@ -55,9 +55,9 @@ public class KafkaJsonSourceConfiguration {
   @Bean
   public ConsumerFactory<Long, io.zeebe.protocol.record.Record<?>> zeebeConsumerFactory() {
     final Properties props = kafkaProperties.getConsumerProperties();
-    final Map<String, Object> p = new HashMap(props);
+    final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
-    LOG.info("Connecting to Kafka '{}'", props.getProperty("bootstrap.servers"));
+    LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
 
     return new DefaultKafkaConsumerFactory<>(p, new LongDeserializer(), new RecordDeserializer());
   }
