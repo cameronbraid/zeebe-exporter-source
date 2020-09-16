@@ -58,6 +58,10 @@ The kafka consumer uses a consumer group which automatically manages the consume
 ```
 @Import(io.zeebe.exporter.source.kafka.KafkaProtobufConfiguration)
 ```
+or
+```
+@Import(io.zeebe.exporter.source.kafka.KafkaJsonConfiguration)
+```
 
 And configure the following properties in your application.yaml (or any config source that spring supports)
 
@@ -74,6 +78,7 @@ Then define a bean in your application context that implements either
 
 * ```io.zeebe.exporter.source.ProtobufSourceConnector```
   * can only be used with protobuf encoded messages
+  
 * ```io.zeebe.exporter.source.RecordSourceConnector```
   * can be used with json encoded messages. 
 
