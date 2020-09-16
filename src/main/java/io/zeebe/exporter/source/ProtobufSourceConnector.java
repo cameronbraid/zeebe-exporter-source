@@ -16,6 +16,5 @@
 package io.zeebe.exporter.source;
 
 public interface ProtobufSourceConnector {
-
   public void connectTo(ProtobufSource source);
 }

@@ -15,10 +15,13 @@
  */
 package io.zeebe.exporter.source.hazelcast;
 
-import io.zeebe.exporter.source.ProtobufSourceConnector;
-import java.util.Optional;
+import java.util.function.Consumer;
 
-public interface HazelcastProtobufSourceConnector extends ProtobufSourceConnector {
-
-  public Optional<Long> startPosition();
+public interface HazelcastSource {
+  /**
+   * Register a listener that is called when an item is read from the ringbuffer and consumed by the
+   * registered listeners. The listener is called with the next sequence number of the ringbuffer.
+   * It can be used to store the sequence number externally.
+   */
+  public void postProcessListener(Consumer<Long> positionConsumer);
 }

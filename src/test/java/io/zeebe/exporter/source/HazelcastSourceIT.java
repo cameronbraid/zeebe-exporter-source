@@ -22,8 +22,9 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.DeploymentEvent;
 import io.zeebe.containers.ZeebeBrokerContainer;
 import io.zeebe.containers.ZeebePort;
-import io.zeebe.exporter.source.hazelcast.HazelcastProtobufSourceConnector;
+import io.zeebe.exporter.source.hazelcast.HazelcastSource;
 import io.zeebe.exporter.source.hazelcast.HazelcastSourceConfiguration;
+import io.zeebe.exporter.source.hazelcast.HazelcastSourceConnector;
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.BpmnModelInstance;
 import java.time.Duration;
@@ -149,12 +150,15 @@ public final class HazelcastSourceIT {
     }
   }
 
-  public static class RecordCollector implements HazelcastProtobufSourceConnector {
+  public static class RecordCollector implements ProtobufSourceConnector, HazelcastSourceConnector {
     List<Message> records = new ArrayList<>();
 
     public void connectTo(ProtobufSource source) {
       source.addListener(records::add);
     }
+
+    @Override
+    public void connectTo(HazelcastSource source) {}
 
     @Override
     public Optional<Long> startPosition() {

@@ -20,8 +20,11 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.HazelcastInstance;
 import io.zeebe.exporter.proto.Schema;
+import io.zeebe.exporter.source.ProtobufSource;
+import io.zeebe.exporter.source.ProtobufSourceConnector;
 import io.zeebe.hazelcast.connect.java.ZeebeHazelcast;
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +58,18 @@ public class HazelcastSourceConfiguration {
     return HazelcastClient.newHazelcastClient(clientConfig);
   }
 
+  interface BuilderSource extends ProtobufSource, HazelcastSource {}
+
   @Bean
   public ZeebeHazelcast zeebeHazelcastBuilder(
-      HazelcastInstance hazelcastInstance, HazelcastProtobufSourceConnector consumer) {
+      HazelcastInstance hazelcastInstance,
+      @Autowired HazelcastSourceConnector hazelcastSourceConnector,
+      @Autowired(required = false) List<ProtobufSourceConnector> protobufSourceConnectors) {
 
     final var builder = ZeebeHazelcast.newBuilder(hazelcastInstance);
 
-    final var source =
-        new HazelcastProtobufSource() {
+    final var builderSource =
+        new BuilderSource() {
 
           @Override
           public void addListener(Consumer<Message> listener) {
@@ -155,9 +162,14 @@ public class HazelcastSourceConfiguration {
           }
         };
 
-    consumer.connectTo(source);
+    hazelcastSourceConnector.connectTo(builderSource);
 
-    final var startOptional = consumer.startPosition();
+    protobufSourceConnectors.forEach(
+        connector -> {
+          connector.connectTo(builderSource);
+        });
+
+    final var startOptional = hazelcastSourceConnector.startPosition();
     if (startOptional.isPresent()) {
       builder.readFrom(startOptional.get());
     } else {
