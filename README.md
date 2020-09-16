@@ -12,7 +12,7 @@ In your spring boot app import the `HazelcastConfiguration`
 
 ```
 
-@org.springframework.context.annotation.Import(io.zeebe.exporter.source.hazelcast.HazelcastConfiguration)
+@Import(io.zeebe.exporter.source.hazelcast.HazelcastConfiguration)
 
 ```
 
@@ -24,7 +24,7 @@ zeebe.exporter.source.hazelcast:
   connectionTimeout: PT30S
 ```
 
-Then define a bean in your application context that implements ```java.util.function.Consumer<io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource>```
+Then define a bean in your application context that implements ```io.zeebe.exporter.source.hazelcast.HazelcastProtobufSourceConnector```
 
 Hazelcast also requires you to manage the `sequence` number, see `postProcessListener` and `startPosition` below
 
@@ -32,8 +32,8 @@ e.g.
 
 ```
 @Component
-public class MyConsumer implements java.util.function.Consumer<io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource> {
-  public void accept(io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource source) {
+public class MyConsumer implements HazelcastProtobufSourceConnector {
+  public void connectTo(io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource source) {
     source.addDeploymentListener(r->System.out.println("Received " + r));
     source.addWorkflowInstanceListener(...)
     ...
@@ -56,7 +56,7 @@ In your spring boot app import the `KafkaProtobufConfiguration` is messages in k
 The kafka consumer uses a consumer group which automatically manages the consumer offset.
 
 ```
-@org.springframework.context.annotation.Import(io.zeebe.exporter.source.kafka.KafkaProtobufConfiguration)
+@Import(io.zeebe.exporter.source.kafka.KafkaProtobufConfiguration)
 ```
 
 And configure the following properties in your application.yaml (or any config source that spring supports)
@@ -72,15 +72,15 @@ zeebe.exporter.source.kafka:
 
 Then define a bean in your application context that implements either
 
-* ```java.util.function.Consumer<io.zeebe.exporter.source.ProtobufSource>```
+* ```io.zeebe.exporter.source.ProtobufSourceConnector```
   * can only be used with protobuf encoded messages
-* ```java.util.function.Consumer<io.zeebe.exporter.source.RecordSource>```
-  * can be used with protobuf or json encoded messages. 
+* ```io.zeebe.exporter.source.RecordSourceConnector```
+  * can be used with json encoded messages. 
 
 ```
 @Component
-public class MyConsumer implements java.util.function.Consumer<io.zeebe.exporter.source.RecordSource> {
-  public void accept(io.zeebe.exporter.source.RecordSource source) {
+public class MyConsumer implements io.zeebe.exporter.source.ProtobufSourceConnector {
+  public void connectTo(io.zeebe.exporter.source.ProtobufSource source) {
     source.addDeploymentListener(r->System.out.println("Received " + r));
     source.addWorkflowInstanceListener(...)
     ...

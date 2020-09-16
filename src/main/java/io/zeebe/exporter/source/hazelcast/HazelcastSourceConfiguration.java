@@ -57,7 +57,7 @@ public class HazelcastSourceConfiguration {
 
   @Bean
   public ZeebeHazelcast zeebeHazelcastBuilder(
-      HazelcastInstance hazelcastInstance, HazelcastProtobufSourceConsumer consumer) {
+      HazelcastInstance hazelcastInstance, HazelcastProtobufSourceConnector consumer) {
 
     final var builder = ZeebeHazelcast.newBuilder(hazelcastInstance);
 

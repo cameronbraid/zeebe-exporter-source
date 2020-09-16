@@ -22,7 +22,7 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.DeploymentEvent;
 import io.zeebe.containers.ZeebeBrokerContainer;
 import io.zeebe.containers.ZeebePort;
-import io.zeebe.exporter.source.hazelcast.HazelcastProtobufSourceConsumer;
+import io.zeebe.exporter.source.hazelcast.HazelcastProtobufSourceConnector;
 import io.zeebe.exporter.source.hazelcast.HazelcastSourceConfiguration;
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.BpmnModelInstance;
@@ -149,7 +149,7 @@ public final class HazelcastSourceIT {
     }
   }
 
-  public static class RecordCollector implements HazelcastProtobufSourceConsumer {
+  public static class RecordCollector implements HazelcastProtobufSourceConnector {
     List<Message> records = new ArrayList<>();
 
     public void connectTo(ProtobufSource source) {

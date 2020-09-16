@@ -18,7 +18,7 @@ package io.zeebe.exporter.source.hazelcast;
 import io.zeebe.exporter.source.ProtobufSourceConnector;
 import java.util.Optional;
 
-public interface HazelcastProtobufSourceConsumer extends ProtobufSourceConnector {
+public interface HazelcastProtobufSourceConnector extends ProtobufSourceConnector {
 
   public Optional<Long> startPosition();
 }
