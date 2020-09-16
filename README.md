@@ -32,7 +32,7 @@ e.g.
 
 ```
 @Component
-public class MyConsumer implements HazelcastProtobufSourceConnector {
+public class MyConnector implements HazelcastProtobufSourceConnector {
   public void connectTo(io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource source) {
     source.addDeploymentListener(r->System.out.println("Received " + r));
     source.addWorkflowInstanceListener(...)
@@ -84,7 +84,7 @@ Then define a bean in your application context that implements either
 
 ```
 @Component
-public class MyConsumer implements io.zeebe.exporter.source.ProtobufSourceConnector {
+public class MyConnector implements io.zeebe.exporter.source.ProtobufSourceConnector {
   public void connectTo(io.zeebe.exporter.source.ProtobufSource source) {
     source.addDeploymentListener(r->System.out.println("Received " + r));
     source.addWorkflowInstanceListener(...)
