@@ -24,24 +24,28 @@ zeebe.exporter.source.hazelcast:
   connectionTimeout: PT30S
 ```
 
-Then define a bean in your application context that implements ```io.zeebe.exporter.source.hazelcast.HazelcastProtobufSourceConnector```
+Then a bean in your application context that implements ```io.zeebe.exporter.source.ProtobufSourceConnector``` to receive the protobuf records
 
-Hazelcast also requires you to manage the `sequence` number, see `postProcessListener` and `startPosition` below
+Hazelcast also requires you to manage the `sequence` number, so you also need to implement ```io.zeebe.exporter.source.hazelcast.HazelcastSourceConnector```
+
 
 e.g.
 
 ```
 @Component
-public class MyConnector implements HazelcastProtobufSourceConnector {
-  public void connectTo(io.zeebe.exporter.source.hazelcast.HazelcastProtobufSource source) {
+public class MyConnector implements ProtobufSourceConnector, HazelcastSourceConnector {
+  
+  public void connectTo(ProtobufSource source) {
     source.addDeploymentListener(r->System.out.println("Received " + r));
     source.addWorkflowInstanceListener(...)
-    ...
-    source.postProcessListener(s->saveSequenceNumber(s))
+  }
+
+  public void connectTo(HazelcastSource source) {
+    source.postProcessListener(s->/* save sequence number */);
   }
 
   public Optional<Long> startPosition() {
-    return loadSequenceNumber();
+    return /* load sequence number */;
   }
 
 }
