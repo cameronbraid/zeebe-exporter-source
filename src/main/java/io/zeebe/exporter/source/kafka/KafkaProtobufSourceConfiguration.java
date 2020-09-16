@@ -15,7 +15,8 @@
  */
 package io.zeebe.exporter.source.kafka;
 
-import io.zeebe.exporters.kafka.serde.RecordDeserializer;
+import com.google.protobuf.Message;
+import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -36,30 +37,30 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 @Configuration
 @EnableKafka
 @EnableConfigurationProperties(value = {KafkaProperties.class})
-public class KafkaJsonConfiguration {
+public class KafkaProtobufSourceConfiguration {
 
-  private static final Logger LOG = LoggerFactory.getLogger(KafkaProtobufConfiguration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaProtobufSourceConfiguration.class);
 
   @Autowired KafkaProperties kafkaProperties;
 
   @Bean
-  public KafkaListenerContainerFactory<
-          ConcurrentMessageListenerContainer<Long, io.zeebe.protocol.record.Record<?>>>
-      zeebeListenerContainerFactory() {
-    final ConcurrentKafkaListenerContainerFactory<Long, io.zeebe.protocol.record.Record<?>>
-        factory = new ConcurrentKafkaListenerContainerFactory<>();
-    factory.setConsumerFactory(zeebeConsumerFactory());
-    return factory;
-  }
-
-  @Bean
-  public ConsumerFactory<Long, io.zeebe.protocol.record.Record<?>> zeebeConsumerFactory() {
+  public ConsumerFactory<Long, Message> zeebeConsumerFactory() {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = new HashMap(props);
 
     LOG.info("Connecting to Kafka '{}'", props.getProperty("bootstrap.servers"));
 
-    return new DefaultKafkaConsumerFactory<>(p, new LongDeserializer(), new RecordDeserializer());
+    return new DefaultKafkaConsumerFactory<>(
+        p, new LongDeserializer(), new ProtobufRecordDeserializer());
+  }
+
+  @Bean
+  public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<Long, Message>>
+      zeebeListenerContainerFactory() {
+    final ConcurrentKafkaListenerContainerFactory<Long, Message> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(zeebeConsumerFactory());
+    return factory;
   }
 
   @Bean
@@ -68,7 +69,7 @@ public class KafkaJsonConfiguration {
   }
 
   @Bean
-  public KafkaListenerJsonSource kafkaListenerJsonSource() {
-    return new KafkaListenerJsonSource();
+  public KafkaListenerProtobufSource kafkaListenerProtobufSource() {
+    return new KafkaListenerProtobufSource();
   }
 }

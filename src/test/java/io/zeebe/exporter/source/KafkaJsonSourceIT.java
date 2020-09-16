@@ -21,7 +21,7 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.DeploymentEvent;
 import io.zeebe.containers.ZeebeBrokerContainer;
 import io.zeebe.containers.ZeebePort;
-import io.zeebe.exporter.source.kafka.KafkaJsonConfiguration;
+import io.zeebe.exporter.source.kafka.KafkaJsonSourceConfiguration;
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.BpmnModelInstance;
 import io.zeebe.protocol.record.Record;
@@ -56,7 +56,7 @@ import org.testcontainers.utility.MountableFile;
  * verification tools get better, all the verification should be moved into this module.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {KafkaJsonConfiguration.class, KafkaJsonSourceIT.TestConfig.class})
+@SpringBootTest(classes = {KafkaJsonSourceConfiguration.class, KafkaJsonSourceIT.TestConfig.class})
 @DirtiesContext
 public final class KafkaJsonSourceIT {
 

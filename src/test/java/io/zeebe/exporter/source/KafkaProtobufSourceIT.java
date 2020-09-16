@@ -22,7 +22,7 @@ import io.zeebe.client.ZeebeClient;
 import io.zeebe.client.api.response.DeploymentEvent;
 import io.zeebe.containers.ZeebeBrokerContainer;
 import io.zeebe.containers.ZeebePort;
-import io.zeebe.exporter.source.kafka.KafkaProtobufConfiguration;
+import io.zeebe.exporter.source.kafka.KafkaProtobufSourceConfiguration;
 import io.zeebe.model.bpmn.Bpmn;
 import io.zeebe.model.bpmn.BpmnModelInstance;
 import java.time.Duration;
@@ -57,7 +57,7 @@ import org.testcontainers.utility.MountableFile;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-    classes = {KafkaProtobufConfiguration.class, KafkaProtobufSourceIT.TestConfig.class})
+    classes = {KafkaProtobufSourceConfiguration.class, KafkaProtobufSourceIT.TestConfig.class})
 @DirtiesContext
 public final class KafkaProtobufSourceIT {
 

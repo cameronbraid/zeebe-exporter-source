@@ -8,11 +8,11 @@ This repository contains the components to make it easier to consume exported me
 
 ## Hazelcast Example
 
-In your spring boot app import the `HazelcastConfiguration`
+In your spring boot app import the `HazelcastSourceConfiguration`
 
 ```
 
-@Import(io.zeebe.exporter.source.hazelcast.HazelcastConfiguration)
+@Import(io.zeebe.exporter.source.hazelcast.HazelcastSourceConfiguration)
 
 ```
 
@@ -55,16 +55,16 @@ public class MyConnector implements ProtobufSourceConnector, HazelcastSourceConn
 
 ## Kafka Example
 
-In your spring boot app import the `KafkaProtobufConfiguration` is messages in kafka re protobuf encoded, or `KafkaJsonConfiguration` for json encoded messages
+In your spring boot app import the `KafkaProtobufSourceConfiguration` is messages in kafka re protobuf encoded, or `KafkaJsonSourceConfiguration` for json encoded messages
 
 The kafka consumer uses a consumer group which automatically manages the consumer offset.
 
 ```
-@Import(io.zeebe.exporter.source.kafka.KafkaProtobufConfiguration)
+@Import(io.zeebe.exporter.source.kafka.KafkaProtobufSourceConfiguration)
 ```
 or
 ```
-@Import(io.zeebe.exporter.source.kafka.KafkaJsonConfiguration)
+@Import(io.zeebe.exporter.source.kafka.KafkaJsonSourceConfiguration)
 ```
 
 And configure the following properties in your application.yaml (or any config source that spring supports)
