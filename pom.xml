@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <name>Zeebe Exporter Source</name>
+  <groupId>io.zeebe</groupId>
+  <artifactId>zeebe-exporter-source</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <url>https://github.com/zeebe-io/zeebe-exporter-source</url>
+  <inceptionYear>2020</inceptionYear>
+
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>3.7</version>
+    <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
+    <relativePath />
+  </parent>
+
+  <properties>
+
+    <!-- release parent settings -->
+    <version.java>11</version.java>
+    <nexus.snapshot.repository>
+      https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/
+    </nexus.snapshot.repository>
+    <nexus.release.repository>https://app.camunda.com/nexus/content/repositories/zeebe-io/
+    </nexus.release.repository>
+
+    <!-- disable jdk8 javadoc checks on release build -->
+    <additionalparam>-Xdoclint:none</additionalparam>
+
+    <!-- license header -->
+    <license.header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</license.header>
+
+    <!-- project dependencies -->
+    <version.assertj>3.17.2</version.assertj>
+
+    <version.junit>4.13</version.junit>
+    <version.log4j>2.11.1</version.log4j>
+    <version.mockito>3.5.10</version.mockito>
+
+    <version.protobuf>3.13.0</version.protobuf>
+    <version.protoc>3.9.1</version.protoc>
+    <version.slf4j>1.7.25</version.slf4j>
+    <version.zeebe>0.24.3</version.zeebe>
+    <version.spring.boot>2.3.3.RELEASE</version.spring.boot>
+      <!-- pin Hazelcast version because of spring-boot-dependencies -->
+    <version.hazelcast>4.0.2</version.hazelcast>
+
+    <version.zeebe-exporter-protobuf>0.12.0-protobuf-source-SNAPSHOT</version.zeebe-exporter-protobuf>
+    <version.hazelcast.exporter>0.9.1</version.hazelcast.exporter>
+
+    <version.kafka.exporter>2.1.0-SNAPSHOT</version.kafka.exporter>
+
+    <!-- plugin version -->
+    <plugin.version.checkstyle>3.1.1</plugin.version.checkstyle>
+    <plugin.version.enforcer>3.0.0-M2</plugin.version.enforcer>
+    <plugin.version.failsafe>2.22.2</plugin.version.failsafe>
+    <plugin.version.fmt>2.10</plugin.version.fmt>
+    <plugin.version.license>3.0</plugin.version.license>
+    <plugin.version.protobuf-maven-plugin>0.6.1</plugin.version.protobuf-maven-plugin>
+    <plugin.version.surefire>2.22.2</plugin.version.surefire>
+    <plugin.version.resources>3.2.0</plugin.version.resources>
+    <plugin.version.shade>3.2.4</plugin.version.shade>
+
+    <!-- maven extensions -->
+    <extension.version.os-maven-plugin>1.6.2</extension.version.os-maven-plugin>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-bom</artifactId>
+        <version>${version.zeebe}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-exporter-protobuf</artifactId>
+        <version>${version.zeebe-exporter-protobuf}</version>
+      </dependency>
+  
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-kafka-exporter-serde</artifactId>
+        <version>${version.kafka.exporter}</version>
+      </dependency>
+  
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${version.spring.boot}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.zeebe.hazelcast</groupId>
+        <artifactId>zeebe-hazelcast-connector</artifactId>
+        <version>${version.hazelcast.exporter}</version>
+      </dependency>
+
+      <dependency>
+          <groupId>com.hazelcast</groupId>
+          <artifactId>hazelcast</artifactId>
+          <version>${version.hazelcast}</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>1.14.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>kafka</artifactId>
+        <version>1.14.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.zeebe</groupId>
+        <artifactId>zeebe-test-container</artifactId>
+        <version>0.33.0</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>io.zeebe.hazelcast</groupId>
+        <artifactId>zeebe-hazelcast-exporter</artifactId>
+        <version>${version.hazelcast.exporter}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.zeebe</groupId>
+      <artifactId>zeebe-exporter-protobuf</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.zeebe</groupId>
+      <artifactId>zeebe-kafka-exporter-serde</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zeebe.hazelcast</groupId>
+      <artifactId>zeebe-hazelcast-connector</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>com.hazelcast</groupId>
+        <artifactId>hazelcast</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zeebe</groupId>
+      <artifactId>zeebe-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>${version.assertj}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${version.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>4.0.2</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!-- test containers for IT -->
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zeebe</groupId>
+      <artifactId>zeebe-test-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>${extension.version.os-maven-plugin}</version>
+      </extension>
+    </extensions>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>11</release>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <!-- Override java source version to workaround javadoc bug https://bugs.openjdk.java.net/browse/JDK-8212233 -->
+          <source>8</source>
+        </configuration>
+      </plugin>
+
+      <!-- LICENSE PLUGIN -->
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${plugin.version.license}</version>
+        <configuration>
+          <header>${license.header}</header>
+          <properties>
+            <owner>camunda services GmbH</owner>
+            <email>info@camunda.com</email>
+          </properties>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+          <mapping>
+            <java>SLASHSTAR_STYLE</java>
+          </mapping>
+        </configuration>
+        <executions>
+          <execution>
+            <id>add-license</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- unit tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${plugin.version.surefire}</version>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+
+      <!-- INTEGRATION TESTS -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${plugin.version.failsafe}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.2</version>
+        <executions>
+            <execution>
+              <id>copy-pre-integration-test</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>io.zeebe</groupId>
+                    <artifactId>zeebe-kafka-exporter</artifactId>
+                    <version>${version.kafka.exporter}</version>
+                    <type>jar</type>
+                    <classifier>jar-with-dependencies</classifier>
+                    <overWrite>true</overWrite>
+                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                    <destFileName>zeebe-kafka-exporter.jar</destFileName>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>io.zeebe.hazelcast</groupId>
+                    <artifactId>zeebe-hazelcast-exporter</artifactId>
+                    <version>${hazelcast.exporter.version}</version>
+                    <type>jar</type>
+                    <classifier>jar-with-dependencies</classifier>
+                    <overWrite>true</overWrite>
+                    <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                    <destFileName>zeebe-hazelcast-exporter.jar</destFileName>
+                  </artifactItem>
+                </artifactItems>
+                <overWriteReleases>false</overWriteReleases>
+                <overWriteSnapshots>true</overWriteSnapshots>
+              </configuration>
+            </execution>
+        </executions>
+
+      </plugin>
+
+      <!-- Google code format plugin -->
+      <plugin>
+        <groupId>com.coveo</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+        <version>${plugin.version.fmt}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>format</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <additionalSourceDirectories>
+            <additionalSourceDirectory>${project.basedir}/src/test/jmh
+            </additionalSourceDirectory>
+          </additionalSourceDirectories>
+        </configuration>
+      </plugin>
+      
+      <!-- Shade Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${plugin.version.shade}</version>
+      </plugin>
+
+
+      <!-- Resources Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>${plugin.version.resources}</version>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <properties>
+        <plugin.version.gpg>1.6</plugin.version.gpg>
+        <gpg.passphrase>${env.GPG_PASS}</gpg.passphrase>
+        <resume>false</resume>
+        <tag>${env.RELEASE_VERSION}</tag>
+        <releaseVersion>${env.RELEASE_VERSION}</releaseVersion>
+        <developmentVersion>${env.DEVELOPMENT_VERSION}</developmentVersion>
+        <arguments>-DskipTests</arguments>
+      </properties>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-gpg-plugin</artifactId>
+              <configuration>
+                <gpgArguments>
+                  <arg>--pinentry-mode</arg>
+                  <arg>loopback</arg>
+                </gpgArguments>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
+  <repositories>
+    <repository>
+      <id>zeebe</id>
+      <name>Zeebe Repository</name>
+      <url>https://app.camunda.com/nexus/content/repositories/zeebe-io/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>zeebe-snapshots</id>
+      <name>Zeebe Snapshot Repository</name>
+      <url>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <!--
+  <scm>
+    <url>https://github.com/zeebe-io/zeebe-exporter-source</url>
+    <connection>scm:git:git@github.com:zeebe-io/zeebe-exporter-source.git</connection>
+    <developerConnection>scm:git:git@github.com:zeebe-io/zeebe-exporter-source.git
+    </developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+-->
+</project>
