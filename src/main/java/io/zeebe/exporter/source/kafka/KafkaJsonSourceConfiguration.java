@@ -16,6 +16,9 @@
 package io.zeebe.exporter.source.kafka;
 
 import io.zeebe.exporters.kafka.serde.RecordDeserializer;
+import io.zeebe.exporters.kafka.serde.RecordId;
+import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -44,22 +47,22 @@ public class KafkaJsonSourceConfiguration {
 
   @Bean
   public KafkaListenerContainerFactory<
-          ConcurrentMessageListenerContainer<Long, io.zeebe.protocol.record.Record<?>>>
+          ConcurrentMessageListenerContainer<RecordId, io.zeebe.protocol.record.Record<?>>>
       zeebeListenerContainerFactory() {
-    final ConcurrentKafkaListenerContainerFactory<Long, io.zeebe.protocol.record.Record<?>>
+    final ConcurrentKafkaListenerContainerFactory<RecordId, io.zeebe.protocol.record.Record<?>>
         factory = new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(zeebeConsumerFactory());
     return factory;
   }
 
   @Bean
-  public ConsumerFactory<Long, io.zeebe.protocol.record.Record<?>> zeebeConsumerFactory() {
+  public ConsumerFactory<RecordId, io.zeebe.protocol.record.Record<?>> zeebeConsumerFactory() {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
     LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
 
-    return new DefaultKafkaConsumerFactory<>(p, new LongDeserializer(), new RecordDeserializer());
+    return new DefaultKafkaConsumerFactory<>(p, new RecordIdDeserializer(), new RecordDeserializer());
   }
 
   @Bean

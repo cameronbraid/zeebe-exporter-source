@@ -15,12 +15,12 @@
  */
 package io.zeebe.exporter.source.kafka;
 
-import com.google.protobuf.Message;
-import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.kafka.common.serialization.LongDeserializer;
+
+import com.google.protobuf.Message;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,10 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
+import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
+import io.zeebe.exporters.kafka.serde.RecordId;
+import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
+
 @Configuration
 @EnableKafka
 @EnableConfigurationProperties(value = {KafkaProperties.class})
@@ -44,20 +48,20 @@ public class KafkaProtobufSourceConfiguration {
   @Autowired KafkaProperties kafkaProperties;
 
   @Bean
-  public ConsumerFactory<Long, Message> zeebeConsumerFactory() {
+  public ConsumerFactory<RecordId, Message> zeebeConsumerFactory() {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
     LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
 
     return new DefaultKafkaConsumerFactory<>(
-        p, new LongDeserializer(), new ProtobufRecordDeserializer());
+        p, new RecordIdDeserializer(), new ProtobufRecordDeserializer());
   }
 
   @Bean
-  public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<Long, Message>>
+  public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<RecordId, Message>>
       zeebeListenerContainerFactory() {
-    final ConcurrentKafkaListenerContainerFactory<Long, Message> factory =
+    final ConcurrentKafkaListenerContainerFactory<RecordId, Message> factory =
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(zeebeConsumerFactory());
     return factory;
