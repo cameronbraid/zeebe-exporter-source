@@ -6,7 +6,7 @@
   <name>Zeebe Exporter Source</name>
   <groupId>io.zeebe</groupId>
   <artifactId>zeebe-exporter-source</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>jar</packaging>
 
   <url>https://github.com/zeebe-io/zeebe-exporter-source</url>
@@ -51,10 +51,10 @@
       <!-- pin Hazelcast version because of spring-boot-dependencies -->
     <version.hazelcast>4.0.2</version.hazelcast>
 
-    <version.zeebe-exporter-protobuf>0.12.0-protobuf-source-SNAPSHOT</version.zeebe-exporter-protobuf>
+    <version.zeebe-exporter-protobuf>0.12-SNAPSHOT-protobuf-source-1</version.zeebe-exporter-protobuf>
     <version.hazelcast.exporter>0.9.1</version.hazelcast.exporter>
 
-    <version.kafka.exporter>2.1.0-SNAPSHOT</version.kafka.exporter>
+    <version.kafka.exporter>2.1.0-SNAPSHOT-protobuf-1</version.kafka.exporter>
 
     <!-- plugin version -->
     <plugin.version.checkstyle>3.1.1</plugin.version.checkstyle>
@@ -435,7 +435,7 @@
       </build>
     </profile>
   </profiles>
-
+<!--
   <repositories>
     <repository>
       <id>zeebe</id>
@@ -453,6 +453,32 @@
       <id>zeebe-snapshots</id>
       <name>Zeebe Snapshot Repository</name>
       <url>https://app.camunda.com/nexus/content/repositories/zeebe-io-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+-->
+  <repositories>
+    <repository>
+      <id>drivenow.nexus</id>
+      <name>DriveNow Repository</name>
+      <url>https://nexus.drivenow.com.au/repository/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>drivenow.nexus.snapshots</id>
+      <name>Zeebe Snapshot Repository</name>
+      <url>https://nexus.drivenow.com.au/repository/public-snapshots/</url>
       <releases>
         <enabled>false</enabled>
       </releases>
