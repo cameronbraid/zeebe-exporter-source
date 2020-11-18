@@ -18,11 +18,9 @@ package io.zeebe.exporter.source.kafka;
 import io.zeebe.exporters.kafka.serde.RecordDeserializer;
 import io.zeebe.exporters.kafka.serde.RecordId;
 import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.kafka.common.serialization.LongDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +60,8 @@ public class KafkaJsonSourceConfiguration {
 
     LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
 
-    return new DefaultKafkaConsumerFactory<>(p, new RecordIdDeserializer(), new RecordDeserializer());
+    return new DefaultKafkaConsumerFactory<>(
+        p, new RecordIdDeserializer(), new RecordDeserializer());
   }
 
   @Bean

@@ -15,12 +15,13 @@
  */
 package io.zeebe.exporter.source.kafka;
 
+import com.google.protobuf.Message;
+import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
+import io.zeebe.exporters.kafka.serde.RecordId;
+import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import com.google.protobuf.Message;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,6 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-
-import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
-import io.zeebe.exporters.kafka.serde.RecordId;
-import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
 
 @Configuration
 @EnableKafka
