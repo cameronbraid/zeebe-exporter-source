@@ -21,9 +21,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("zeebe.exporter.source.kafka")
 public class KafkaProperties {
 
-  private Format format;
-
   private Properties consumerProperties;
+  private String topics = "zeebe";
 
   public Properties getConsumerProperties() {
     return consumerProperties;
@@ -33,16 +32,11 @@ public class KafkaProperties {
     this.consumerProperties = consumerProperties;
   }
 
-  public Format getFormat() {
-    return format;
+  public String getTopics() {
+    return topics;
   }
 
-  public void setFormat(Format format) {
-    this.format = format;
-  }
-
-  public enum Format {
-    protobuf,
-    json
+  public void setTopics(String topics) {
+    this.topics = topics;
   }
 }

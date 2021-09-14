@@ -23,70 +23,96 @@ import java.util.function.Consumer;
 public abstract class AbstractProtobufSource extends AbstractListenerSource<Message>
     implements ProtobufSource {
 
+  @Override
   public void addListener(Consumer<Message> listener) {
     addListener(Message.class, listener);
   }
 
+  @Override
   public void addDeploymentListener(Consumer<Schema.DeploymentRecord> listener) {
     addListener(Schema.DeploymentRecord.class, listener);
   }
 
-  public void addWorkflowInstanceListener(Consumer<Schema.WorkflowInstanceRecord> listener) {
-    addListener(Schema.WorkflowInstanceRecord.class, listener);
+  @Override
+  public void addDeploymentDistributionListener(
+      Consumer<Schema.DeploymentDistributionRecord> listener) {
+    addListener(Schema.DeploymentDistributionRecord.class, listener);
   }
 
+  @Override
+  public void addProcessListener(Consumer<Schema.ProcessRecord> listener) {
+    addListener(Schema.ProcessRecord.class, listener);
+  }
+
+  @Override
+  public void addProcessInstanceListener(Consumer<Schema.ProcessInstanceRecord> listener) {
+    addListener(Schema.ProcessInstanceRecord.class, listener);
+  }
+
+  @Override
+  public void addProcessEventListener(Consumer<Schema.ProcessEventRecord> listener) {
+    addListener(Schema.ProcessEventRecord.class, listener);
+  }
+
+  @Override
   public void addVariableListener(Consumer<Schema.VariableRecord> listener) {
     addListener(Schema.VariableRecord.class, listener);
   }
 
+  @Override
   public void addVariableDocumentListener(Consumer<Schema.VariableDocumentRecord> listener) {
     addListener(Schema.VariableDocumentRecord.class, listener);
   }
 
+  @Override
   public void addJobListener(Consumer<Schema.JobRecord> listener) {
     addListener(Schema.JobRecord.class, listener);
   }
 
+  @Override
   public void addJobBatchListener(Consumer<Schema.JobBatchRecord> listener) {
     addListener(Schema.JobBatchRecord.class, listener);
   }
 
+  @Override
   public void addIncidentListener(Consumer<Schema.IncidentRecord> listener) {
     addListener(Schema.IncidentRecord.class, listener);
   }
 
+  @Override
   public void addTimerListener(Consumer<Schema.TimerRecord> listener) {
     addListener(Schema.TimerRecord.class, listener);
   }
 
+  @Override
   public void addMessageListener(Consumer<Schema.MessageRecord> listener) {
     addListener(Schema.MessageRecord.class, listener);
   }
 
+  @Override
   public void addMessageSubscriptionListener(Consumer<Schema.MessageSubscriptionRecord> listener) {
     addListener(Schema.MessageSubscriptionRecord.class, listener);
   }
 
+  @Override
   public void addMessageStartEventSubscriptionListener(
       Consumer<Schema.MessageStartEventSubscriptionRecord> listener) {
     addListener(Schema.MessageStartEventSubscriptionRecord.class, listener);
   }
 
-  public void addWorkflowInstanceSubscriptionListener(
-      Consumer<Schema.WorkflowInstanceSubscriptionRecord> listener) {
-    addListener(Schema.WorkflowInstanceSubscriptionRecord.class, listener);
+  @Override
+  public void addProcessMessageSubscriptionListener(
+      Consumer<Schema.ProcessMessageSubscriptionRecord> listener) {
+    addListener(Schema.ProcessMessageSubscriptionRecord.class, listener);
   }
 
-  public void addWorkflowInstanceCreationListener(
-      Consumer<Schema.WorkflowInstanceCreationRecord> listener) {
-    addListener(Schema.WorkflowInstanceCreationRecord.class, listener);
+  @Override
+  public void addProcessInstanceCreationListener(
+      Consumer<Schema.ProcessInstanceCreationRecord> listener) {
+    addListener(Schema.ProcessInstanceCreationRecord.class, listener);
   }
 
-  public void addWorkflowInstanceResultListener(
-      Consumer<Schema.WorkflowInstanceResultRecord> listener) {
-    addListener(Schema.WorkflowInstanceResultRecord.class, listener);
-  }
-
+  @Override
   public void addErrorListener(Consumer<Schema.ErrorRecord> listener) {
     addListener(Schema.ErrorRecord.class, listener);
   }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- an additional log4j2 configuration to control the exporter's logging level when injected -->
+<Configuration shutdownHook="disable" status="WARN">
+  <Loggers additivity="true">
+    <Logger level="debug" name="io.camunda.zeebe.broker.exporter.kafka"/>
+    <Logger level="trace" name="io.camunda.zeebe.broker.exporter.debug"/>
+    <Logger level="error" name="org.apache"/>
+  </Loggers>
+</Configuration>

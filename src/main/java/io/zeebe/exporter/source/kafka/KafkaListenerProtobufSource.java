@@ -16,13 +16,20 @@
 package io.zeebe.exporter.source.kafka;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.Message;
+import io.camunda.zeebe.protocol.record.Record;
+import io.camunda.zeebe.protocol.record.RecordValue;
+import io.zeebe.exporter.proto.RecordTransformer;
 import org.springframework.kafka.annotation.KafkaListener;
 
 /** Kafka listener form a single zeebe topic */
 public class KafkaListenerProtobufSource extends AbstractProtobufSource {
-  @KafkaListener(containerFactory = "zeebeListenerContainerFactory", topics = "zeebe")
-  public void handleRecord(Message message) throws InvalidProtocolBufferException {
-    super.handleRecord(message);
+
+  @KafkaListener(
+      containerFactory = "zeebeListenerContainerFactory",
+      topics =
+          "#{@'zeebe.exporter.source.kafka-io.zeebe.exporter.source.kafka.KafkaProperties'.topics}")
+  public void handleRecord(Record<? extends RecordValue> message)
+      throws InvalidProtocolBufferException {
+    super.handleRecord(RecordTransformer.toProtobufMessage(message));
   }
 }

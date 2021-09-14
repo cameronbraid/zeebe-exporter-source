@@ -24,7 +24,14 @@ public interface ProtobufSource {
 
   public void addDeploymentListener(Consumer<Schema.DeploymentRecord> listener);
 
-  public void addWorkflowInstanceListener(Consumer<Schema.WorkflowInstanceRecord> listener);
+  public void addDeploymentDistributionListener(
+      Consumer<Schema.DeploymentDistributionRecord> listener);
+
+  public void addProcessListener(Consumer<Schema.ProcessRecord> listener);
+
+  public void addProcessInstanceListener(Consumer<Schema.ProcessInstanceRecord> listener);
+
+  public void addProcessEventListener(Consumer<Schema.ProcessEventRecord> listener);
 
   public void addVariableListener(Consumer<Schema.VariableRecord> listener);
 
@@ -45,14 +52,11 @@ public interface ProtobufSource {
   public void addMessageStartEventSubscriptionListener(
       Consumer<Schema.MessageStartEventSubscriptionRecord> listener);
 
-  public void addWorkflowInstanceSubscriptionListener(
-      Consumer<Schema.WorkflowInstanceSubscriptionRecord> listener);
+  public void addProcessMessageSubscriptionListener(
+      Consumer<Schema.ProcessMessageSubscriptionRecord> listener);
 
-  public void addWorkflowInstanceCreationListener(
-      Consumer<Schema.WorkflowInstanceCreationRecord> listener);
-
-  public void addWorkflowInstanceResultListener(
-      Consumer<Schema.WorkflowInstanceResultRecord> listener);
+  public void addProcessInstanceCreationListener(
+      Consumer<Schema.ProcessInstanceCreationRecord> listener);
 
   public void addErrorListener(Consumer<Schema.ErrorRecord> listener);
 }

@@ -1,5 +1,10 @@
 zeebe:
   broker:
     exporters:
+      debug:
+        className: io.camunda.zeebe.broker.exporter.debug.DebugHttpExporter
+        args:
+          port: 8000
       hazelcast:
         className: io.zeebe.hazelcast.exporter.HazelcastExporter
+        jarPath: /usr/local/zeebe/exporters/zeebe-hazelcast-exporter.jar

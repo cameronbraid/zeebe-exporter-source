@@ -53,17 +53,7 @@ public class ConnectConnectors {
         throw new RuntimeException(
             "There are RecordSourceConnector beans defined but no protobuf or json source is defined");
       }
-
-      if (recordSource != null) {
-        recordSourceConnectors.forEach(connector -> connector.connectTo(recordSource));
-      } else {
-
-        throw new RuntimeException("protobuf to record converter not yet implemented");
-        // RecordToProtoSourceAdapter protobufSourceAdapter = new
-        // RecordToProtoSourceAdapter(protobufSource);
-        // recordSourceConsumers.forEach(consumer->consumer.accept(protobufSourceAdapter));
-
-      }
+      recordSourceConnectors.forEach(connector -> connector.connectTo(recordSource));
     }
   }
 }

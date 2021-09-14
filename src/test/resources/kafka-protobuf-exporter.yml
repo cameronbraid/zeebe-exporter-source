@@ -1,8 +1,0 @@
-zeebe:
-  broker:
-    exporters:
-      kafka:
-        className: io.zeebe.exporters.kafka.KafkaExporter
-        args:
-          producer:
-            format: protobuf

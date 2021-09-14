@@ -15,12 +15,12 @@
  */
 package io.zeebe.exporter.source.kafka;
 
-import com.google.protobuf.Message;
-import io.zeebe.exporters.kafka.serde.ProtobufRecordDeserializer;
+import io.zeebe.exporters.kafka.serde.RecordDeserializer;
+import io.zeebe.exporters.kafka.serde.RecordId;
+import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.kafka.common.serialization.LongDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,21 +44,24 @@ public class KafkaProtobufSourceConfiguration {
   @Autowired KafkaProperties kafkaProperties;
 
   @Bean
-  public ConsumerFactory<Long, Message> zeebeConsumerFactory() {
+  public ConsumerFactory<RecordId, io.camunda.zeebe.protocol.record.Record<?>>
+      zeebeConsumerFactory() {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
     LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
 
     return new DefaultKafkaConsumerFactory<>(
-        p, new LongDeserializer(), new ProtobufRecordDeserializer());
+        p, new RecordIdDeserializer(), new RecordDeserializer());
   }
 
   @Bean
-  public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<Long, Message>>
+  public KafkaListenerContainerFactory<
+          ConcurrentMessageListenerContainer<RecordId, io.camunda.zeebe.protocol.record.Record<?>>>
       zeebeListenerContainerFactory() {
-    final ConcurrentKafkaListenerContainerFactory<Long, Message> factory =
-        new ConcurrentKafkaListenerContainerFactory<>();
+    final ConcurrentKafkaListenerContainerFactory<
+            RecordId, io.camunda.zeebe.protocol.record.Record<?>>
+        factory = new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(zeebeConsumerFactory());
     return factory;
   }
@@ -69,7 +72,7 @@ public class KafkaProtobufSourceConfiguration {
   }
 
   @Bean
-  public KafkaListenerProtobufSource kafkaListenerProtobufSource() {
+  public KafkaListenerProtobufSource kafkaListenerJsonAsProtobufSource() {
     return new KafkaListenerProtobufSource();
   }
 }

@@ -15,31 +15,41 @@
  */
 package io.zeebe.exporter.source;
 
-import io.zeebe.protocol.record.Record;
-import io.zeebe.protocol.record.value.DeploymentRecordValue;
-import io.zeebe.protocol.record.value.ErrorRecordValue;
-import io.zeebe.protocol.record.value.IncidentRecordValue;
-import io.zeebe.protocol.record.value.JobBatchRecordValue;
-import io.zeebe.protocol.record.value.JobRecordValue;
-import io.zeebe.protocol.record.value.MessageRecordValue;
-import io.zeebe.protocol.record.value.MessageStartEventSubscriptionRecordValue;
-import io.zeebe.protocol.record.value.MessageSubscriptionRecordValue;
-import io.zeebe.protocol.record.value.TimerRecordValue;
-import io.zeebe.protocol.record.value.VariableDocumentRecordValue;
-import io.zeebe.protocol.record.value.VariableRecordValue;
-import io.zeebe.protocol.record.value.WorkflowInstanceCreationRecordValue;
-import io.zeebe.protocol.record.value.WorkflowInstanceRecordValue;
-import io.zeebe.protocol.record.value.WorkflowInstanceResultRecordValue;
-import io.zeebe.protocol.record.value.WorkflowInstanceSubscriptionRecordValue;
+import io.camunda.zeebe.protocol.record.Record;
+import io.camunda.zeebe.protocol.record.RecordValue;
+import io.camunda.zeebe.protocol.record.value.DeploymentDistributionRecordValue;
+import io.camunda.zeebe.protocol.record.value.DeploymentRecordValue;
+import io.camunda.zeebe.protocol.record.value.ErrorRecordValue;
+import io.camunda.zeebe.protocol.record.value.IncidentRecordValue;
+import io.camunda.zeebe.protocol.record.value.JobBatchRecordValue;
+import io.camunda.zeebe.protocol.record.value.JobRecordValue;
+import io.camunda.zeebe.protocol.record.value.MessageRecordValue;
+import io.camunda.zeebe.protocol.record.value.MessageStartEventSubscriptionRecordValue;
+import io.camunda.zeebe.protocol.record.value.MessageSubscriptionRecordValue;
+import io.camunda.zeebe.protocol.record.value.ProcessEventRecordValue;
+import io.camunda.zeebe.protocol.record.value.ProcessInstanceCreationRecordValue;
+import io.camunda.zeebe.protocol.record.value.ProcessInstanceRecordValue;
+import io.camunda.zeebe.protocol.record.value.ProcessMessageSubscriptionRecordValue;
+import io.camunda.zeebe.protocol.record.value.TimerRecordValue;
+import io.camunda.zeebe.protocol.record.value.VariableDocumentRecordValue;
+import io.camunda.zeebe.protocol.record.value.VariableRecordValue;
+import io.camunda.zeebe.protocol.record.value.deployment.Process;
 import java.util.function.Consumer;
 
 public interface RecordSource {
 
-  public void addListener(Consumer<Record<?>> listener);
+  public void addListener(Consumer<Record<? extends RecordValue>> listener);
 
   public void addDeploymentListener(Consumer<Record<DeploymentRecordValue>> listener);
 
-  public void addWorkflowInstanceListener(Consumer<Record<WorkflowInstanceRecordValue>> listener);
+  public void addDeploymentDistributionListener(
+      Consumer<Record<DeploymentDistributionRecordValue>> listener);
+
+  public void addProcessListener(Consumer<Record<Process>> listener);
+
+  public void addProcessInstanceListener(Consumer<Record<ProcessInstanceRecordValue>> listener);
+
+  public void addProcessEventListener(Consumer<Record<ProcessEventRecordValue>> listener);
 
   public void addVariableListener(Consumer<Record<VariableRecordValue>> listener);
 
@@ -61,14 +71,11 @@ public interface RecordSource {
   public void addMessageStartEventSubscriptionListener(
       Consumer<Record<MessageStartEventSubscriptionRecordValue>> listener);
 
-  public void addWorkflowInstanceSubscriptionListener(
-      Consumer<Record<WorkflowInstanceSubscriptionRecordValue>> listener);
+  public void addProcessMessageSubscriptionListener(
+      Consumer<Record<ProcessMessageSubscriptionRecordValue>> listener);
 
-  public void addWorkflowInstanceCreationListener(
-      Consumer<Record<WorkflowInstanceCreationRecordValue>> listener);
-
-  public void addWorkflowInstanceResultListener(
-      Consumer<Record<WorkflowInstanceResultRecordValue>> listener);
+  public void addProcessInstanceCreationListener(
+      Consumer<Record<ProcessInstanceCreationRecordValue>> listener);
 
   public void addErrorListener(Consumer<Record<ErrorRecordValue>> listener);
 }

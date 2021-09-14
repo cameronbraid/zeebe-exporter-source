@@ -45,7 +45,7 @@ public class HazelcastSourceConfiguration {
   public HazelcastInstance hazelcastInstance(HazelcastProperties hazelcastProperties) {
 
     final ClientConfig clientConfig = new ClientConfig();
-    clientConfig.getNetworkConfig().addAddress(hazelcastProperties.getConnection());
+    clientConfig.getNetworkConfig().addAddress(hazelcastProperties.getAddress());
 
     final var connectionRetryConfig =
         clientConfig.getConnectionStrategyConfig().getConnectionRetryConfig();
@@ -53,7 +53,7 @@ public class HazelcastSourceConfiguration {
     connectionRetryConfig.setClusterConnectTimeoutMillis(
         Duration.parse(hazelcastProperties.getConnectionTimeout()).toMillis());
 
-    LOG.info("Connecting to Hazelcast '{}'", hazelcastProperties.getConnection());
+    LOG.info("Connecting to Hazelcast '{}'", hazelcastProperties.getAddress());
 
     return HazelcastClient.newHazelcastClient(clientConfig);
   }
@@ -74,7 +74,10 @@ public class HazelcastSourceConfiguration {
           @Override
           public void addListener(Consumer<Message> listener) {
             builder.addDeploymentListener((Consumer) listener);
-            builder.addWorkflowInstanceListener((Consumer) listener);
+            builder.addDeploymentDistributionListener((Consumer) listener);
+            builder.addProcessListener((Consumer) listener);
+            builder.addProcessInstanceListener((Consumer) listener);
+            builder.addProcessEventListener((Consumer) listener);
             builder.addVariableListener((Consumer) listener);
             builder.addVariableDocumentListener((Consumer) listener);
             builder.addJobListener((Consumer) listener);
@@ -84,9 +87,8 @@ public class HazelcastSourceConfiguration {
             builder.addMessageListener((Consumer) listener);
             builder.addMessageSubscriptionListener((Consumer) listener);
             builder.addMessageStartEventSubscriptionListener((Consumer) listener);
-            builder.addWorkflowInstanceSubscriptionListener((Consumer) listener);
-            builder.addWorkflowInstanceCreationListener((Consumer) listener);
-            builder.addWorkflowInstanceResultListener((Consumer) listener);
+            builder.addProcessMessageSubscriptionListener((Consumer) listener);
+            builder.addProcessInstanceCreationListener((Consumer) listener);
             builder.addErrorListener((Consumer) listener);
           }
 
@@ -94,9 +96,21 @@ public class HazelcastSourceConfiguration {
             builder.addDeploymentListener(listener);
           }
 
-          public void addWorkflowInstanceListener(
-              Consumer<Schema.WorkflowInstanceRecord> listener) {
-            builder.addWorkflowInstanceListener(listener);
+          public void addDeploymentDistributionListener(
+              Consumer<Schema.DeploymentDistributionRecord> listener) {
+            builder.addDeploymentDistributionListener(listener);
+          }
+
+          public void addProcessListener(Consumer<Schema.ProcessRecord> listener) {
+            builder.addProcessListener(listener);
+          }
+
+          public void addProcessInstanceListener(Consumer<Schema.ProcessInstanceRecord> listener) {
+            builder.addProcessInstanceListener(listener);
+          }
+
+          public void addProcessEventListener(Consumer<Schema.ProcessEventRecord> listener) {
+            builder.addProcessEventListener(listener);
           }
 
           public void addVariableListener(Consumer<Schema.VariableRecord> listener) {
@@ -138,19 +152,14 @@ public class HazelcastSourceConfiguration {
             builder.addMessageStartEventSubscriptionListener(listener);
           }
 
-          public void addWorkflowInstanceSubscriptionListener(
-              Consumer<Schema.WorkflowInstanceSubscriptionRecord> listener) {
-            builder.addWorkflowInstanceSubscriptionListener(listener);
+          public void addProcessMessageSubscriptionListener(
+              Consumer<Schema.ProcessMessageSubscriptionRecord> listener) {
+            builder.addProcessMessageSubscriptionListener(listener);
           }
 
-          public void addWorkflowInstanceCreationListener(
-              Consumer<Schema.WorkflowInstanceCreationRecord> listener) {
-            builder.addWorkflowInstanceCreationListener(listener);
-          }
-
-          public void addWorkflowInstanceResultListener(
-              Consumer<Schema.WorkflowInstanceResultRecord> listener) {
-            builder.addWorkflowInstanceResultListener(listener);
+          public void addProcessInstanceCreationListener(
+              Consumer<Schema.ProcessInstanceCreationRecord> listener) {
+            builder.addProcessInstanceCreationListener(listener);
           }
 
           public void addErrorListener(Consumer<Schema.ErrorRecord> listener) {

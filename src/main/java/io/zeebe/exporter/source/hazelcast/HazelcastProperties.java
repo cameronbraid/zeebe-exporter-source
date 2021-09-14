@@ -20,15 +20,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("zeebe.exporter.source.hazelcast")
 public class HazelcastProperties {
 
-  private String connection = "localhost:5701";
+  private String address = "localhost:5701";
   private String connectionTimeout = "PT30S";
 
-  public String getConnection() {
-    return connection;
+  public String getAddress() {
+    return address;
   }
 
-  public void setConnection(String connection) {
-    this.connection = connection;
+  public void setAddress(String address) {
+    this.address = address;
   }
 
   public String getConnectionTimeout() {

@@ -18,25 +18,19 @@ package io.zeebe.exporter.source;
 import static org.awaitility.Awaitility.await;
 
 import com.google.protobuf.Message;
-import io.zeebe.client.ZeebeClient;
-import io.zeebe.client.api.response.DeploymentEvent;
-import io.zeebe.containers.ZeebeBrokerContainer;
-import io.zeebe.containers.ZeebePort;
+import io.camunda.zeebe.client.ZeebeClient;
+import io.camunda.zeebe.model.bpmn.Bpmn;
+import io.camunda.zeebe.model.bpmn.BpmnModelInstance;
+import io.zeebe.containers.ZeebeContainer;
 import io.zeebe.exporter.source.kafka.KafkaProtobufSourceConfiguration;
-import io.zeebe.model.bpmn.Bpmn;
-import io.zeebe.model.bpmn.BpmnModelInstance;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -44,9 +38,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.utility.MountableFile;
 
 /**
  * This tests the deployment of the exporter into a Zeebe broker in a as-close-to-production way as
@@ -61,107 +52,41 @@ import org.testcontainers.utility.MountableFile;
 @DirtiesContext
 public final class KafkaProtobufSourceIT {
 
-  private static final KafkaContainer KAFKA_CONTAINER = newKafkaContainer();
-  private static final ZeebeBrokerContainer ZEEBE_CONTAINER = newZeebeContainer();
-
-  @ClassRule
-  public static final RuleChain RULE_CHAIN =
-      RuleChain.outerRule(KAFKA_CONTAINER).around(ZEEBE_CONTAINER);
+  private static KafkaContainer KAFKA_CONTAINER;
+  private static ZeebeContainer ZEEBE_CONTAINER;
 
   private @Autowired RecordCollector recordCollector;
+
   private ZeebeClient client;
 
   @BeforeClass
   public static void setupClass() {
-    final var bootstrapServer =
-        "localhost:" + KAFKA_CONTAINER.getMappedPort(KafkaContainer.KAFKA_PORT);
+
+    KAFKA_CONTAINER = Containers.newKafkaContainer();
+    KAFKA_CONTAINER.start();
+
     System.setProperty(
         "zeebe.exporter.source.kafka.consumerProperties",
         String.format(
             "bootstrap.servers=%s\ngroup.id=kafka-source-it\nauto.offset.reset=earliest",
-            bootstrapServer));
+            KAFKA_CONTAINER.getBootstrapServers()
+            // "localhost:" + KAFKA_CONTAINER.getMappedPort(KafkaContainer.KAFKA_PORT)
+            ));
+
+    ZEEBE_CONTAINER =
+        Containers.newZeebeContainer("kafka-exporter.yml", "zeebe-kafka-exporter.jar");
+    ZEEBE_CONTAINER.withEnv("ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_PRODUCER_SERVERS", "kafka:9092");
+    ZEEBE_CONTAINER.start();
   }
 
   @Before
   public void setUp() {
-    client = newClient();
+    client = Containers.newClient(ZEEBE_CONTAINER);
   }
 
   @After
   public void tearDown() {
-    if (client != null) {
-      client.close();
-      client = null;
-    }
-  }
-
-  @Test
-  public void shouldReceiveRecord() {
-    // given
-    final BpmnModelInstance process =
-        Bpmn.createExecutableProcess("process")
-            .startEvent("start")
-            .serviceTask("task")
-            .zeebeJobType("type")
-            .endEvent()
-            .done();
-
-    // when
-    final DeploymentEvent deploymentEvent =
-        client.newDeployCommand().addWorkflowModel(process, "process.bpmn").send().join();
-
-    // then
-    await()
-        .pollInSameThread()
-        .atMost(Duration.ofSeconds(10))
-        .until(
-            () -> {
-              return recordCollector.records.size() > 0;
-            });
-  }
-
-  private ZeebeClient newClient() {
-    return ZeebeClient.newClientBuilder()
-        .brokerContactPoint(ZEEBE_CONTAINER.getExternalAddress(ZeebePort.GATEWAY))
-        .usePlaintext()
-        .build();
-  }
-
-  @SuppressWarnings("OctalInteger")
-  private static ZeebeBrokerContainer newZeebeContainer() {
-    final ZeebeBrokerContainer container =
-        new ZeebeBrokerContainer(ZeebeClient.class.getPackage().getImplementationVersion());
-    final MountableFile exporterJar =
-        MountableFile.forClasspathResource("zeebe-kafka-exporter.jar", 0775);
-    final MountableFile exporterConfig =
-        MountableFile.forClasspathResource("kafka-protobuf-exporter.yml", 0775);
-    final String networkAlias = "zeebe";
-
-    return container
-        .withNetwork(Network.SHARED)
-        .withNetworkAliases(networkAlias)
-        .withEnv("ZEEBE_BROKER_NETWORK_HOST", "0.0.0.0")
-        .withEnv("ZEEBE_BROKER_NETWORK_ADVERTISEDHOST", networkAlias)
-        .withEnv("ZEEBE_BROKER_EXPORTERS_KAFKA_ARGS_PRODUCER_SERVERS", "kafka:9092")
-        .withCopyFileToContainer(exporterJar, "/usr/local/zeebe/lib/zeebe-kafka-exporter.jar")
-        .withCopyFileToContainer(exporterConfig, "/usr/local/zeebe/config/kafka-exporter.yml")
-        .withEnv(
-            "SPRING_CONFIG_ADDITIONAL_LOCATION", "file:/usr/local/zeebe/config/kafka-exporter.yml")
-        .withLogConsumer(new Slf4jLogConsumer(newContainerLogger("zeebeContainer"), true));
-  }
-
-  private static KafkaContainer newKafkaContainer() {
-    final KafkaContainer container = new KafkaContainer("5.5.1");
-    return container
-        .withEmbeddedZookeeper()
-        .withNetwork(Network.SHARED)
-        .withNetworkAliases("kafka")
-        .withExposedPorts(KafkaContainer.KAFKA_PORT)
-        .withLogConsumer(new Slf4jLogConsumer(newContainerLogger("kafkaContainer"), true));
-  }
-
-  private static Logger newContainerLogger(final String containerName) {
-    return LoggerFactory.getLogger(KafkaProtobufSourceIT.class.getName() + "." + containerName);
+    Containers.close(client, ZEEBE_CONTAINER, KAFKA_CONTAINER);
   }
 
   @Configuration
@@ -178,5 +103,29 @@ public final class KafkaProtobufSourceIT {
     public void connectTo(ProtobufSource source) {
       source.addListener(records::add);
     }
+  }
+
+  @Test
+  public void shouldReceiveRecord() {
+    // given
+    final BpmnModelInstance process =
+        Bpmn.createExecutableProcess("process")
+            .startEvent("start")
+            .serviceTask("task")
+            .zeebeJobType("type")
+            .endEvent()
+            .done();
+
+    // when
+    client.newDeployCommand().addProcessModel(process, "process.bpmn").send().join();
+
+    // then
+    await()
+        .pollInSameThread()
+        .atMost(Duration.ofSeconds(10))
+        .until(
+            () -> {
+              return recordCollector.records.size() > 0;
+            });
   }
 }
