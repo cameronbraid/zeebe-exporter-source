@@ -17,16 +17,23 @@ package io.zeebe.exporter.source.kafka;
 
 import io.camunda.zeebe.protocol.record.Record;
 import io.camunda.zeebe.protocol.record.RecordValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 
 /** Kafka listener form a single zeebe topic */
 public class KafkaListenerRecordSource extends AbstractRecordSource {
+
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaListenerRecordSource.class);
 
   @KafkaListener(
       containerFactory = "zeebeListenerContainerFactory",
       topics =
           "#{@'zeebe.exporter.source.kafka-io.zeebe.exporter.source.kafka.KafkaProperties'.topics}")
   public void handleRecord(Record<? extends RecordValue> message) {
+
+    LOG.debug("Received Message {} {}", message.getRecordType(), message.getValueType());
+
     super.handleRecord(message);
   }
 }

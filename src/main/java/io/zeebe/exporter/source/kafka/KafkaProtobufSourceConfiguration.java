@@ -49,7 +49,10 @@ public class KafkaProtobufSourceConfiguration {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
-    LOG.info("Connecting to Kafka '{}', topics {}", p.get("bootstrap.servers"), kafkaProperties.getTopics());
+    LOG.info(
+        "Connecting to Kafka '{w}', subscribing to topics {}",
+        p.get("bootstrap.servers"),
+        kafkaProperties.getTopics());
 
     return new DefaultKafkaConsumerFactory<>(
         p, new RecordIdDeserializer(), new RecordDeserializer());

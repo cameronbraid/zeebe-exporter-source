@@ -19,10 +19,14 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.camunda.zeebe.protocol.record.Record;
 import io.camunda.zeebe.protocol.record.RecordValue;
 import io.zeebe.exporter.proto.RecordTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 
 /** Kafka listener form a single zeebe topic */
 public class KafkaListenerProtobufSource extends AbstractProtobufSource {
+
+  private static final Logger LOG = LoggerFactory.getLogger(KafkaListenerProtobufSource.class);
 
   @KafkaListener(
       containerFactory = "zeebeListenerContainerFactory",
@@ -30,6 +34,9 @@ public class KafkaListenerProtobufSource extends AbstractProtobufSource {
           "#{@'zeebe.exporter.source.kafka-io.zeebe.exporter.source.kafka.KafkaProperties'.topics}")
   public void handleRecord(Record<? extends RecordValue> message)
       throws InvalidProtocolBufferException {
+
+    LOG.debug("Received Message {} {}", message.getRecordType(), message.getValueType());
+
     super.handleRecord(RecordTransformer.toProtobufMessage(message));
   }
 }
