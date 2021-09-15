@@ -60,7 +60,7 @@ public class KafkaRecordSourceConfiguration {
     final Properties props = kafkaProperties.getConsumerProperties();
     final Map<String, Object> p = props == null ? new HashMap<>() : new HashMap(props);
 
-    LOG.info("Connecting to Kafka '{}'", p.get("bootstrap.servers"));
+    LOG.info("Connecting to Kafka '{}', topics {}", p.get("bootstrap.servers"), kafkaProperties.getTopics());
 
     return new DefaultKafkaConsumerFactory<>(
         p, new RecordIdDeserializer(), new RecordDeserializer());
