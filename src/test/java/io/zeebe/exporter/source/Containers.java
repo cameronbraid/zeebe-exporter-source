@@ -36,7 +36,7 @@ public class Containers {
   public static ZeebeContainer newZeebeContainer(
       String exporterConfigPath, String exporterJarPath) {
     final var container =
-        new ZeebeContainer(ZeebeDefaults.getInstance().getDefaultDockerImage().withTag("1.0.1"));
+        new ZeebeContainer(ZeebeDefaults.getInstance().getDefaultDockerImage().withTag("8.0.2"));
     final MountableFile exporterConfig =
         MountableFile.forClasspathResource(exporterConfigPath, 0775);
     final MountableFile exporterJar = MountableFile.forClasspathResource(exporterJarPath, 0775);

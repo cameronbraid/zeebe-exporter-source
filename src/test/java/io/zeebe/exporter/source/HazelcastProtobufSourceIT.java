@@ -88,7 +88,7 @@ public final class HazelcastProtobufSourceIT {
             .done();
 
     // when
-    client.newDeployCommand().addProcessModel(process, "process.bpmn").send().join();
+    client.newDeployResourceCommand().addProcessModel(process, "process.bpmn").send().join();
 
     // then
     await()

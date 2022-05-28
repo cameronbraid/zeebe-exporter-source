@@ -15,12 +15,16 @@
  */
 package io.zeebe.exporter.source.kafka;
 
+import io.camunda.zeebe.protocol.jackson.ZeebeProtocolModule;
 import io.zeebe.exporters.kafka.serde.RecordDeserializer;
 import io.zeebe.exporters.kafka.serde.RecordId;
 import io.zeebe.exporters.kafka.serde.RecordIdDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

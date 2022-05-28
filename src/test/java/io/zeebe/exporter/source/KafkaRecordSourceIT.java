@@ -20,12 +20,17 @@ import static org.awaitility.Awaitility.await;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.model.bpmn.Bpmn;
 import io.camunda.zeebe.model.bpmn.BpmnModelInstance;
+import io.camunda.zeebe.protocol.jackson.ZeebeProtocolModule;
 import io.camunda.zeebe.protocol.record.Record;
 import io.zeebe.containers.ZeebeContainer;
 import io.zeebe.exporter.source.kafka.KafkaRecordSourceConfiguration;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -51,6 +56,8 @@ import org.testcontainers.containers.KafkaContainer;
     classes = {KafkaRecordSourceConfiguration.class, KafkaRecordSourceIT.TestConfig.class})
 @DirtiesContext
 public final class KafkaRecordSourceIT {
+
+  private static final ObjectMapper mapper = new ObjectMapper().registerModule(new ZeebeProtocolModule());
 
   private static KafkaContainer KAFKA_CONTAINER;
   private static ZeebeContainer ZEEBE_CONTAINER;
@@ -104,7 +111,11 @@ public final class KafkaRecordSourceIT {
       source.addListener(
           r -> {
             records.add(r);
-            System.out.println(r.toJson());
+            try {
+              System.out.println(mapper.writeValueAsString(r));
+            } catch (JsonProcessingException e) {
+              e.printStackTrace();
+            }
           });
       source.addDeploymentListener(d -> {});
     }
@@ -122,7 +133,7 @@ public final class KafkaRecordSourceIT {
             .done();
 
     // when
-    client.newDeployCommand().addProcessModel(process, "process.bpmn").send().join();
+    client.newDeployResourceCommand().addProcessModel(process, "process.bpmn").send().join();
 
     // then
     await()
